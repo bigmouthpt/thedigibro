@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Newsletter Tone Bot</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Newsletter Tone Bot</h1>
+      <p class="subtitle">Chatbot addestrato sul tuo tone of voice editoriale</p>
+      <section id="chat" class="chat"></section>
+      <form id="chat-form">
+        <textarea id="message" rows="3" placeholder="Scrivi qui..."></textarea>
+        <button type="submit">Invia</button>
+      </form>
+    </main>
+
+    <script>
+      const form = document.getElementById("chat-form");
+      const chat = document.getElementById("chat");
+      const messageInput = document.getElementById("message");
+
+      function addBubble(role, text) {
+        const div = document.createElement("div");
+        div.className = `bubble ${role}`;
+        div.textContent = text;
+        chat.appendChild(div);
+        chat.scrollTop = chat.scrollHeight;
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const message = messageInput.value.trim();
+        if (!message) return;
+
+        addBubble("user", message);
+        messageInput.value = "";
+
+        const res = await fetch("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message }),
+        });
+
+        const data = await res.json();
+        addBubble("assistant", data.answer || data.error || "Errore inatteso");
+      });
+    </script>
+  </body>
+</html>
