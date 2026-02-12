@@ -53,3 +53,8 @@ async def chat(request: Request):
 
     answer = brain.answer(message)
     return JSONResponse({"answer": answer})
+
+@app.get("/healthz")
+def healthz():
+    return {"status": "ok", "initialized": brain is not None}
+
